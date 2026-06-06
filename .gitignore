@@ -1,0 +1,33 @@
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Ignore virtual environment directories
+venv/
+env/
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+src/__pycache__/
+test/__pycache__/
+utilities/__pycache__/
+playwright_virtual/
+# Ignore distribution files
+dist/
+build/
+*.egg-info/
+*.egg
+# Ignore coverage reports
+.coverage
+.coverage.*
+htmlcov/
+# Ignore logs
+artifacts/logs/
+# Ignore system files
+.DS_Store
+Thumbs.db
+# Ignore VS Code settings
+.vscode/
+# Ignore PyCharm settings
+.idea/

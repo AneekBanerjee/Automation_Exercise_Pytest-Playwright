@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Extracted Dashboard - Control Panel | Cards as Rows</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Global */
+    body { font-family: Arial, sans-serif; margin: 0; }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      background-color: #2c3e50;
+      padding: 10px;
+      color: white;
+      align-items: center;
+    }
+    .navbar a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .navbar a:hover { background-color: #34495e; }
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #34495e;
+      min-width: 160px;
+      z-index: 1;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      display: block;
+      padding: 12px 16px;
+      color: white;
+      text-decoration: none;
+    }
+
+    /* Containers and layout */
+    .container { padding: 20px; }
+    .hidden { display: none; }
+    .row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Tiles / Cards */
+    .tile, .card {
+      background-color: #ecf0f1;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .tile:hover, .card:hover { transform: scale(1.02); cursor: pointer; }
+    .card button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Inputs */
+    select, input[type="text"], button {
+      font-size: 1rem;
+    }
+
+    /* Canvas sizing */
+    canvas {
+      width: 100% !important;
+      height: 200px !important;
+    }
+
+    /* Stack instance cards as rows */
+    #instanceCards {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    #instanceCards .card {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <a onclick="showPage('main')">Operations</a>
+
+    <div class="dropdown">
+      <a>Provisioning</a>
+      <div class="dropdown-content">
+        <a onclick="showPage('instances')">Instances</a>
+      </div>
+    </div>
+
+    <a onclick="showPage('library')">Library</a>
+    <a onclick="showPage('infrastructure')">Infrastructure</a>
+    <a onclick="showPage('backups')">Backups</a>
+    <a onclick="showPage('tools')">Tools</a>
+    <a onclick="showPage('administration')">Administration</a>
+  </div>
+
+  <!-- Main / Pages -->
+  <div id="main" class="container">
+    <h2>Welcome to Operations</h2>
+    <p>This is the Operations dashboard.</p>
+  </div>
+
+  <div id="library" class="container hidden">
+    <h2>Library</h2>
+    <p>Access your documents and resources here.</p>
+  </div>
+
+  <div id="infrastructure" class="container hidden">
+    <h2>Infrastructure</h2>
+    <p>Overview of your virtualized environment.</p>
+  </div>
+
+  <div id="backups" class="container hidden">
+    <h2>Backups</h2>
+    <p>Manage and monitor backup jobs.</p>
+  </div>
+
+  <div id="tools" class="container hidden">
+    <h2>Tools</h2>
+    <p>Utility tools and diagnostics.</p>
+  </div>
+
+  <div id="administration" class="container hidden">
+    <h2>Administration</h2>
+    <p>Admin settings and controls.</p>
+  </div>
+
+  <div id="instances" class="container hidden">
+    <h2>Provisioning → Instances</h2>
+
+    <!-- Filters & Add Button -->
+    <div class="row" style="align-items: center;">
+      <input id="searchInput" type="text" placeholder="Search instances..."
+        style="padding:8px; flex:1; min-width:200px; border:1px solid #ccc; border-radius:4px;">
+
+      <select id="filterGroup" style="padding:8px; border-radius:4px;">
+        <option>All Groups</option><option>Group A</option><option>Group B</option>
+      </select>
+
+      <select id="filterCloud" style="padding:8px; border-radius:4px;">
+        <option>All Clouds</option><option>AWS</option><option>Azure</option><option>GCP</option>
+      </select>
+
+      <select id="filterStatus" style="padding:8px; border-radius:4px;">
+        <option>All Statuses</option><option>Running</option><option>Stopped</option><option>Pending</option>
+      </select>
+
+      <button onclick="addInstance()"
+        style="padding:8px 16px; background-color:#2ecc71; color:white; border:none; border-radius:4px; cursor:pointer;">
+        Add
+      </button>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+      <div class="tile">
+        <h3>Compute</h3>
+        <canvas id="cpuChart"></canvas>
+      </div>
+      <div class="tile">
+        <h3>Storage</h3>
+        <canvas id="storageChart"></canvas>
+      </div>
+      <div class="tile">
+        <h3>Networking</h3>
+        <canvas id="networkChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Stacked instance cards -->
+    <div id="instanceCards"></div>
+
+    <!-- Instance Creation Modal -->
+    <div id="instanceModal" class="hidden" style="
+      position: fixed; top: 20%; left: 50%;
+      transform: translate(-50%, -20%);
+      background: white; border:2px solid #ccc; padding:20px;
+      border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.3);
+      z-index:999; width:300px;">
+      <h3 style="margin-top:0;">CREATE INSTANCE</h3>
+      <form id="instanceForm">
+        <label><input type="radio" name="vmType" value="kvm"> Create KVM</label><br>
+        <label><input type="radio" name="vmType" value="vmware"> Create VMware</label><br><br>
+
+        <label>Group:</label>
+        <select id="groupSelect"><option>Group A</option><option>Group B</option></select><br><br>
+
+        <label>Cloud:</label>
+        <select id="cloudSelect"><option>AWS</option><option>Azure</option><option>GCP</option></select><br><br>
+
+        <label>Status:</label>
+        <select id="statusSelect"><option>Running</option><option>Stopped</option><option>Pending</option></select><br><br>
+
+        <button type="button" onclick="closeModal()"
+          style="padding:8px 16px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;">
+          OK
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // --- Page Navigation
+    function showPage(id) {
+        document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('hidden');
+        if (id === 'instances') renderCharts();
+    }
+
+    // --- Charts (init once)
+    function renderCharts() {
+        if (window.chartsInitialized) return;
+        window.chartsInitialized = true;
+
+        // CPU bar chart
+        new Chart(document.getElementById('cpuChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Core 1', 'Core 2', 'Core 3', 'Core 4'],
+                datasets: [{ label: 'CPU Usage (%)', data: [65, 75, 50, 80], backgroundColor: '#3498db' }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Storage pie chart
+        new Chart(document.getElementById('storageChart'), {
+          type: 'pie',
+          data: {
+            labels: ['Used', 'Free'],
+            datasets: [{ data: [120, 380], backgroundColor: ['#e74c3c', '#2ecc71'] }]
+          },
+          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Network line chart
+        new Chart(document.getElementById('networkChart'), {
+          type: 'line',
+          data: {
+            labels: ['00:00', '01:00', '02:00', '03:00', '04:00'],
+            datasets: [{ label: 'Traffic (Mbps)', data: [100, 150, 200, 250, 300], borderColor: '#f39c12', fill: false }]
+          },
+          options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+    }
+
+    // Filters wiring
+    ['filterGroup', 'filterCloud', 'filterStatus']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener('change', filterInstances);
+        });
+    const searchEl = document.getElementById('searchInput');
+    if (searchEl) searchEl.addEventListener('input', filterInstances);
+
+    function filterInstances() {
+        const groupEl = document.getElementById('filterGroup');
+        const cloudEl = document.getElementById('filterCloud');
+        const statusEl = document.getElementById('filterStatus');
+        const termEl = document.getElementById('searchInput');
+
+        const group  = groupEl ? groupEl.value.toLowerCase() : 'all groups';
+        const cloud  = cloudEl ? cloudEl.value.toLowerCase() : 'all clouds';
+        const status = statusEl ? statusEl.value.toLowerCase() : 'all statuses';
+        const term   = termEl ? termEl.value.toLowerCase() : '';
+
+        document.querySelectorAll('#instanceCards .card').forEach(card => {
+            const g = card.dataset.group || '';
+            const c = card.dataset.cloud || '';
+            const s = card.dataset.status || '';
+            const name = (card.querySelector('h3') ? card.querySelector('h3').textContent : '').toLowerCase();
+
+            const show = (group==='all groups' || g===group) &&
+                         (cloud==='all clouds' || c===cloud) &&
+                         (status==='all statuses' || s===status) &&
+                         (!term || name.includes(term));
+
+            card.style.display = show ? '' : 'none';
+        });
+    }
+
+    // Modal & Card Logic
+    function addInstance() {
+        const modal = document.getElementById('instanceModal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        const type = document.querySelector('input[name="vmType"]:checked');
+        if (!type) return alert('Please select an instance type.');
+
+        const group = document.getElementById('groupSelect').value;
+        const cloud = document.getElementById('cloudSelect').value;
+        const status = document.getElementById('statusSelect').value;
+        const name = `${type.value.toUpperCase()}-${cloud}`;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.group = group.toLowerCase();
+        card.dataset.cloud = cloud.toLowerCase();
+        card.dataset.status = status.toLowerCase();
+
+        card.innerHTML = `
+          <div style="display: flex; gap: 20px; align-items: center; width: 100%;">
+            <h3 style="margin: 0;">${name}</h3>
+            <div><strong>Group:</strong> ${group}</div>
+            <div><strong>Cloud:</strong> ${cloud}</div>
+            <div><strong>Status:</strong> ${status}</div>
+            <button onclick="deleteInstance(this)">Delete</button>
+          </div>
+        `;
+
+        document.getElementById('instanceCards').appendChild(card);
+
+        filterInstances();
+        document.getElementById('instanceModal').classList.add('hidden');
+    }
+
+    function deleteInstance(btn) {
+      const card = btn.closest('.card');
+      if (card) card.remove();
+    }
+
+    // Initialize default visible page
+    showPage('main');
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "URL": "https://automationexercise.com/",
+  "INSTANCE_URL": "file:///C:/Users/aneek.banerjee//Downloads//InstanceTest.html",
+  "PAYMENT_URL": "https://automationexercise.com/payment",
+  "SEARCHED_PRODUCT": "Top",
+  "CONTACT_DETAILS": {
+    "NAME": "Aneek Banerjee",
+    "EMAIL_ID": "aneek.banerjee@gmail.com",
+    "SUBJECT": "Demo",
+    "MESSAGE": "Contact purpose"
+  },
+  "CARD_DETAILS": [
+    {
+      "NAME": "Aneek Banerjee",
+      "NUMBER": "123456789012345678",
+      "CVV": "311",
+      "EXP_MONTH": "02",
+      "EXP_YEAR": "2033"
+    }
+  ],
+  "FORMS_DATA": {
+    "GENDER": "Mr",
+    "FIRST_NAME": "Aneek",
+    "LAST_NAME": "Banerjee",
+    "EMAIL_ID": "aneek.banerjee@gmail.com",
+    "FULL_NAME": "Aneek Banerjee",
+    "PASSWORD": "Aneek@Banerjee",
+    "DOB": "4",
+    "MOB": "April",
+    "YOB": "1995",
+    "COMPANY": "HCL",
+    "ADDRESS_1": "Jigani HCL Tech",
+    "ADDRESS_2": "Industrial Area",
+    "COUNTRY": "India",
+    "STATE": "Karnataka",
+    "CITY": "Bangalore",
+    "ZIP_CODE": "560087",
+    "MOBILE_NUMBER": "1234567890"
+  },
+  "INVALID_LOGIN_DATA": {
+    "EMAIL_ID": "aneek.banerjee@gmail.com",
+    "PASSWORD": "Aneek@Banerjee"
+  },
+  "VM_DETAILS": [
+    {
+      "VM_NAME": "KVM",
+      "GROUP": "Group A",
+      "CLOUD": "AWS",
+      "STATUS": "Stopped"
+    },
+    {
+      "VM_NAME": "KVM",
+      "GROUP": "Group A",
+      "CLOUD": "AWS",
+      "STATUS": "Pending"
+    },
+    {
+      "VM_NAME": "KVM",
+      "GROUP": "Group A",
+      "CLOUD": "AWS",
+      "STATUS": "Running"
+    }
+  ],
+  "INSTANCE_FILTER": {
+    "SEARCH_TEXT": "KVM",
+    "GROUP": "Group A",
+    "CLOUD": "AWS",
+    "STATUS": "Stopped"
+  }
+}
