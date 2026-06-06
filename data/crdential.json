@@ -1,6 +1,6 @@
 {
   "URL": "https://automationexercise.com/",
-  "INSTANCE_URL": "file:///C:/Users/aneek.banerjee//Downloads//InstanceTest.html",
+  "INSTANCE_URL": "file:///C:/Users/Aneek Banerjee/Desktop/Automation-Exercise/Automation_Exercise_Pytest-Playwright/data/InstanceTest.html",
   "PAYMENT_URL": "https://automationexercise.com/payment",
   "SEARCHED_PRODUCT": "Top",
   "CONTACT_DETAILS": {

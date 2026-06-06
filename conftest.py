@@ -1,7 +1,18 @@
 # conftest.py
 # Pytest configuration for Playwright-based tests
+import subprocess
+import sys
+
 import pytest
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:
+    from playwright import sync_playwright
+
+
+def _ensure_playwright_browsers_installed():
+    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+
 
 @pytest.fixture(scope="module")
 def create_page_instance():

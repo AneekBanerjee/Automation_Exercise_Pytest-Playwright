@@ -1,6 +1,6 @@
 from utilities import common_lib
 from src import instance_page
-import pytest  # type: ignore[import]
+import pytest
 
 class TestInstance:
     '''

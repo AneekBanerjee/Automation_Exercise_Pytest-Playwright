@@ -23,7 +23,7 @@ build/
 .coverage.*
 htmlcov/
 # Ignore logs
-artifacts/logs/
+artifacts/
 # Ignore system files
 .DS_Store
 Thumbs.db
